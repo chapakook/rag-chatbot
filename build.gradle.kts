@@ -21,23 +21,24 @@ repositories {
 
 dependencies {
     // web
-    implementation("org.springframework.boot:spring-boot-starter-web") // 기본 REST API (Servlet)
-    implementation("org.springframework.boot:spring-boot-starter-webflux") // WebClient (비동기 HTTP)
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
 
     // json
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin") // Kotlin <-> JSON 직렬화
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     // kotlin
-    implementation("org.jetbrains.kotlin:kotlin-reflect") // Kotlin 리플렉션 (DI 등)
-    implementation("io.projectreactor.kotlin:reactor-kotlin-extensions") // Reactor + Kotlin DSL 지원
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor") // Coroutine ↔ Reactor 변환
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
 
     // test
-    testImplementation("org.springframework.boot:spring-boot-starter-test") // Spring 기본 테스트
-    testImplementation("io.projectreactor:reactor-test") // Mono/Flux 테스트 도구
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5") // Kotlin DSL + JUnit5 연동
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test") // Coroutine 테스트 도구
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher") // JUnit 런처 (IDE 실행용)
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("io.projectreactor:reactor-test")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("io.mockk:mockk:1.13.10")
 }
 
 kotlin {
