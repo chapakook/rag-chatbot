@@ -99,7 +99,7 @@ Content-Type: application/json
 
 ```json
 {
-  "embedding": [0.00123, -0.0045, ..., 0.00021]
+  "embedding": [0.00123, -0.0045, "...", 0.00021]
 }
 ```
 
