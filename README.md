@@ -5,7 +5,7 @@ OpenAI의 임벤딩 API와 Qdrant 벡터 DB를 활용하여, 문서 기반 질�
 
 ---
 
-## 🏡 기술 스택
+## 📚 기술 스택
 **Language / Build**
 - Kotlin 1.9.25
 - Java 21
@@ -15,18 +15,6 @@ OpenAI의 임벤딩 API와 Qdrant 벡터 DB를 활용하여, 문서 기반 질�
 - Spring Boot 3.5.4
 - Spring Web (REST API)
 - Spring WebFlux (WebClient)
-
-**Async / Reactive**
-- Kotlin Coroutines
-- Reactor + Coroutine 연동
-
-**JSON & Serialization**
-- Jackson Kotlin Module
-
-**Testing**
-- JUnit5 + Spring Boot Test
-- Coroutine Test
-- Reactor Test
 
 **Embedding / Vector**
 - OpenAI Embedding API
