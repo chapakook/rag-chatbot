@@ -6,7 +6,7 @@ import org.springframework.boot.runApplication
 import java.util.TimeZone
 
 @SpringBootApplication
-class RagChatbotApplication{
+class RagChatbotApplication {
      @PostConstruct
      fun started() {
          // set timezone

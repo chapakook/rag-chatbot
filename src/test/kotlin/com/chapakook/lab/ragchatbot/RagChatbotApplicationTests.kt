@@ -9,5 +9,4 @@ class RagChatbotApplicationTests {
     @Test
     fun contextLoads() {
     }
-
 }

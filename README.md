@@ -82,29 +82,6 @@ networks:
 
 ---
 
-## 📬 API 예시
-
-### POST /embed
-
-```http
-POST /embed
-Content-Type: application/json
-
-{
-  "text": "Spring Boot는 Java 기반 프리모워크입니다."
-}
-```
-
-응답:
-
-```json
-{
-  "embedding": [0.00123, -0.0045, "...", 0.00021]
-}
-```
-
----
-
 ## 📌 참고
 
 * [OpenAI Embedding API Docs](https://platform.openai.com/docs/guides/embeddings)
