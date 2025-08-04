@@ -37,4 +37,9 @@ enum class ErrorType(val status: HttpStatus, val code: String, val message: Stri
         HttpStatus.BAD_REQUEST.reasonPhrase,
         "OpenAI API 요청이 너무 깁니다. 요청 길이를 줄여주세요.",
     ),
+    OPENAI_API_TOO_MANY_REQUESTS(
+        HttpStatus.TOO_MANY_REQUESTS,
+        HttpStatus.TOO_MANY_REQUESTS.reasonPhrase,
+        "OpenAI API 요청이 너무 많습니다. 잠시 후 다시 시도해주세요.",
+    ),
 }
