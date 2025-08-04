@@ -56,14 +56,43 @@ class OpenAiEmbeddingClientTest {
             )
 
             // act
-            val exception = assertThrows<CoreException> {
-                openAiEmbeddingClient.embed(invalidApiKey, question)
-            }
+            val exception = assertThrows<CoreException> { openAiEmbeddingClient.embed(invalidApiKey, question) }
 
             // assert
             assertAll(
                 { assertThat(exception).isInstanceOf(CoreException::class.java) },
                 { assertThat(exception.errorType).isEqualTo(ErrorType.OPENAI_API_KEY_INVALID) },
+            )
+        }
+
+        @Test
+        fun `bad - OpenAI Key가 권한이 없는 경우, "OPENAI_API_KEY_FORBIDDEN"을 반환한다`() {
+            // arrange
+            val forbiddenApiKey = "forbidden_api_key"
+            val question = "RAG는 무엇인가요?"
+
+            every { webClient.post() } returns requestBodyUriSpec
+            every { requestBodyUriSpec.uri("/v1/embeddings") } returns requestBodySpec
+            every { requestBodySpec.header("Authorization", "Bearer $forbiddenApiKey") } returns requestBodySpec
+            every { requestBodySpec.bodyValue(any<OpenAiRequest.Embedding.V1>()) } returns requestHeadersSpec
+            every { requestHeadersSpec.retrieve() } returns responseSpec
+            every {
+                responseSpec.bodyToMono(OpenAiResponse.Embedding::class.java)
+            } throws WebClientResponseException.create(
+                HttpStatus.FORBIDDEN.value(),
+                "Forbidden",
+                HttpHeaders.EMPTY,
+                "API Key forbidden".toByteArray(),
+                null,
+            )
+
+            // act
+            val exception = assertThrows<CoreException> { openAiEmbeddingClient.embed(forbiddenApiKey, question) }
+
+            // assert
+            assertAll(
+                { assertThat(exception).isInstanceOf(CoreException::class.java) },
+                { assertThat(exception.errorType).isEqualTo(ErrorType.OPENAI_API_KEY_FORBIDDEN) },
             )
         }
     }
