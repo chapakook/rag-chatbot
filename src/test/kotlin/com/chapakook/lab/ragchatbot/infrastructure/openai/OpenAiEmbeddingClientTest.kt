@@ -95,5 +95,20 @@ class OpenAiEmbeddingClientTest {
                 { assertThat(exception.errorType).isEqualTo(ErrorType.OPENAI_API_KEY_FORBIDDEN) },
             )
         }
+
+        @Test
+        fun `bad - 요청 간격이 너무 빠른 겨우 "OPENAI_API_RATE_LIMIT"을 반환한다`() {
+            // TODO: Implement test for request length exceeding limit
+        }
+
+        @Test
+        fun `bad - 요청 길이 초과시 input 길이가 너무 길면 "OPENAI_API_REQUEST_TOO_LONG"을 반환한다`() {
+            // TODO: Implement test for request length exceeding limit
+        }
+
+        @Test
+        fun `good - 정상 요청시 1536 길이의 벡터를 반환한다`() {
+            // TODO: Implement test for request length exceeding limit
+        }
     }
 }
