@@ -6,7 +6,6 @@ import io.mockk.every
 import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -17,14 +16,13 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
 
 class OpenAiEmbeddingClientTest {
+    private val webClient: WebClient = mockk()
+    private val requestBodyUriSpec: WebClient.RequestBodyUriSpec = mockk()
+    private val requestBodySpec: WebClient.RequestBodySpec = mockk()
+    private val requestHeadersSpec: WebClient.RequestHeadersSpec<*> = mockk()
+    private val responseSpec: WebClient.ResponseSpec = mockk()
 
-    private lateinit var openAiEmbeddingClient: OpenAiEmbeddingClient
-    private val webClient: WebClient = mockk<WebClient>()
-
-    @BeforeEach
-    fun setUp() {
-        openAiEmbeddingClient = OpenAiEmbeddingClient(webClient)
-    }
+    private val openAiEmbeddingClient: OpenAiEmbeddingClient = OpenAiEmbeddingClient(webClient)
 
     @DisplayName("OpenAI Embedding Client Tests")
     @Nested
@@ -42,17 +40,15 @@ class OpenAiEmbeddingClientTest {
             val invalidApiKey = "invelid_api_key"
             val question = "RAG는 무엇인가요?"
 
-            val mockRequestSpec = mockk<WebClient.RequestBodyUriSpec>()
-            val mockRequestBodySpec = mockk<WebClient.RequestBodySpec>()
-            val mockResponseSpec = mockk<WebClient.ResponseSpec>()
-
-            every { webClient.post() } returns mockRequestSpec
-            every { mockRequestSpec.bodyValue(any<OpenAiRequest.Embedding.V1>()) } returns mockRequestBodySpec
-            every { mockRequestBodySpec.retrieve() } returns mockResponseSpec
+            every { webClient.post() } returns requestBodyUriSpec
+            every { requestBodyUriSpec.uri("/v1/embeddings") } returns requestBodySpec
+            every { requestBodySpec.header("Authorization", "Bearer $invalidApiKey") } returns requestBodySpec
+            every { requestBodySpec.bodyValue(any<OpenAiRequest.Embedding.V1>()) } returns requestHeadersSpec
+            every { requestHeadersSpec.retrieve() } returns responseSpec
             every {
-                mockResponseSpec.bodyToMono(OpenAiResponse.Embedding::class.java)
+                responseSpec.bodyToMono(OpenAiResponse.Embedding::class.java)
             } throws WebClientResponseException.create(
-                 HttpStatus.UNAUTHORIZED.value(),
+                HttpStatus.UNAUTHORIZED.value(),
                 "Unauthorized",
                 HttpHeaders.EMPTY,
                 "API Key invalid".toByteArray(),
@@ -61,13 +57,13 @@ class OpenAiEmbeddingClientTest {
 
             // act
             val exception = assertThrows<CoreException> {
-                openAiEmbeddingClient.embed(invalidApiKey,question)
+                openAiEmbeddingClient.embed(invalidApiKey, question)
             }
 
             // assert
             assertAll(
                 { assertThat(exception).isInstanceOf(CoreException::class.java) },
-                { assertThat(exception.errorType).isEqualTo(ErrorType.OPENAI_API_KEY_INVALID)}
+                { assertThat(exception.errorType).isEqualTo(ErrorType.OPENAI_API_KEY_INVALID) },
             )
         }
     }
