@@ -28,7 +28,7 @@ class OpenAiEmbeddingClientTest {
     @Nested
     inner class Embed {
         /**
-         * - [ ] OpenAI Key가 유요하지 않을 경우, `OPENAI_API_KEY_INVALID`을 반환한다.
+         * - [x] OpenAI Key가 유요하지 않을 경우, `OPENAI_API_KEY_INVALID`을 반환한다.
          * - [ ] OpenAI Key가 권한이 없는 경우 `OPENAI_API_KEY_FORBIDDEN`을 반환한다.
          * - [ ] 요청 간격이 너무 빠른 경우 `OPENAI_API_RATE_LIMIT`을 반환한다.
          * - [ ] 요청 길이 초과시 input 길이가 너무 길면 `OPENAI_API_REQUEST_TOO_LONG`을 반환한다.
