@@ -54,6 +54,6 @@ tasks.withType<Test> {
     jvmArgs(
         "-XX:+EnableDynamicAgentLoading",
         "-Djdk.instrument.traceUsage=false",
-        "-Dkotlinx.coroutines.debug.enable.creation.stack.trace=false"
+        "-Dkotlinx.coroutines.debug.enable.creation.stack.trace=false",
     )
 }
