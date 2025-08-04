@@ -25,8 +25,10 @@ class OpenAiEmbeddingClient(
                 .block() ?: throw IllegalStateException("OpenAI 응답이 null입니다")
 
             return response.data.first().embedding.let { Embedding(it) }
-        }catch (ex: WebClientResponseException.Unauthorized){
+        } catch (ex: WebClientResponseException.Unauthorized){
             throw CoreException(ErrorType.OPENAI_API_KEY_INVALID, "OpenAI API Key가 유효하지 않습니다.")
+        } catch(ex: WebClientResponseException.Forbidden) {
+            throw CoreException(ErrorType.OPENAI_API_KEY_FORBIDDEN, "OpenAI API Key가 권한이 없습니다.")
         }
     }
 }
