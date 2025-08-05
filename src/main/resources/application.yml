@@ -1,6 +1,8 @@
 spring:
   application:
     name: rag-chatbot
+  config:
+    import: optional:file:application-secret.yml
 
 springdoc:
   use-fqn: true
