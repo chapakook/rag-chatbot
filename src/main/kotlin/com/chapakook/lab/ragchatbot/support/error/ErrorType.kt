@@ -10,10 +10,15 @@ enum class ErrorType(val status: HttpStatus, val code: String, val message: Stri
     CONFLICT(HttpStatus.CONFLICT, HttpStatus.CONFLICT.reasonPhrase, "이미 존재하는 리소스입니다."),
 
     /** OpenAI API 범용 에러 */
-    OPENAI_API_UNEXPECTED_RESPONSE(
+    OPENAI_API_UNKNOWN_ERROR(
         HttpStatus.INTERNAL_SERVER_ERROR,
         HttpStatus.INTERNAL_SERVER_ERROR.reasonPhrase,
         "OpenAI API로부터 예상치 못한 응답을 받았습니다.",
+    ),
+    OPENAI_API_INTERNAL_SERVER_ERROR(
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        HttpStatus.INTERNAL_SERVER_ERROR.reasonPhrase,
+        "OpenAI API의 서버 에러가 발생했습니다. 잠시후 다시 시도해주세요.",
     ),
 
     /** OpenAI API 키 에러 */
@@ -22,24 +27,25 @@ enum class ErrorType(val status: HttpStatus, val code: String, val message: Stri
     OPENAI_API_KEY_FORBIDDEN(HttpStatus.BAD_REQUEST, HttpStatus.FORBIDDEN.reasonPhrase, "OpenAI API 키가 권한이 없습니다."),
 
     /** OpenAI API 요청 에러 */
-    OPENAI_API_RATE_LIMIT(
+    OPENAI_API_TOO_MANY_REQUESTS(
         HttpStatus.TOO_MANY_REQUESTS,
         HttpStatus.TOO_MANY_REQUESTS.reasonPhrase,
         "OpenAI API 요청이 너무 많습니다. 잠시 후 다시 시도해주세요.",
     ),
+    OPENAI_QUOTA_EXCEEDED(HttpStatus.TOO_MANY_REQUESTS, HttpStatus.TOO_MANY_REQUESTS.reasonPhrase, "OpenAI API 사용량을 초과했습니다."),
     OPENAI_API_REQUEST_TIMEOUT(
         HttpStatus.REQUEST_TIMEOUT,
         HttpStatus.REQUEST_TIMEOUT.reasonPhrase,
         "OpenAI API 요청이 시간 초과되었습니다. 잠시 후 다시 시도해주세요.",
     ),
-    OPENAI_API_REQUEST_TOO_LONG(
+    OPENAI_CONTEXT_LENGTH_EXCEEDED(
         HttpStatus.BAD_REQUEST,
         HttpStatus.BAD_REQUEST.reasonPhrase,
         "OpenAI API 요청이 너무 깁니다. 요청 길이를 줄여주세요.",
     ),
-    OPENAI_API_TOO_MANY_REQUESTS(
-        HttpStatus.TOO_MANY_REQUESTS,
-        HttpStatus.TOO_MANY_REQUESTS.reasonPhrase,
-        "OpenAI API 요청이 너무 많습니다. 잠시 후 다시 시도해주세요.",
+    OPENAI_MODEL_NOT_FOUND(
+        HttpStatus.NOT_FOUND,
+        HttpStatus.NOT_FOUND.reasonPhrase,
+        "OpenAI API 해당모델을 찾을 수 없습니다. 요청항 모델명을 확인해주세요.",
     ),
 }

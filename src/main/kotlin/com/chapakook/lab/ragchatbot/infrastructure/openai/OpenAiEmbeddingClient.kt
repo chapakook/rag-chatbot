@@ -4,6 +4,7 @@ import com.chapakook.lab.ragchatbot.domain.embedding.Embedding
 import com.chapakook.lab.ragchatbot.domain.embedding.EmbeddingClient
 import com.chapakook.lab.ragchatbot.support.error.CoreException
 import com.chapakook.lab.ragchatbot.support.error.ErrorType
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
@@ -13,22 +14,36 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 class OpenAiEmbeddingClient(
     private val webClient: WebClient,
 ) : EmbeddingClient {
-    override fun embed(apiKey: String, question: String): Embedding {
-        val request = OpenAiRequest.Embedding.V1(input = question)
-        try {
-            val response = webClient.post()
-                .uri("/v1/embeddings")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer $apiKey")
-                .bodyValue(request)
-                .retrieve()
-                .bodyToMono(OpenAiResponse.Embedding::class.java)
-                .block() ?: throw IllegalStateException("OpenAI 응답이 null입니다")
+    override fun embed(apiKey: String, question: String): Embedding = try {
+        webClient.post()
+            .uri("/v1/embeddings")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer $apiKey")
+            .bodyValue(OpenAiRequest.Embedding.V1(input = question))
+            .retrieve()
+            .bodyToMono(OpenAiResponse.Embedding::class.java)
+            .block()
+            ?.data?.firstOrNull()
+            ?.embedding
+            ?.let { Embedding(it) }
+            ?: throw IllegalStateException("OpenAI 응답이 null입니다")
+    } catch (ex: WebClientResponseException) {
+        throw handleOpenAiException(ex)
+    }
 
-            return response.data.first().embedding.let { Embedding(it) }
-        } catch (ex: WebClientResponseException.Unauthorized) {
-            throw CoreException(ErrorType.OPENAI_API_KEY_INVALID, "OpenAI API Key가 유효하지 않습니다.")
-        } catch (ex: WebClientResponseException.Forbidden) {
-            throw CoreException(ErrorType.OPENAI_API_KEY_FORBIDDEN, "OpenAI API Key가 권한이 없습니다.")
-        }
+    private fun extractErrorCode(json: String): String? = try {
+        jacksonObjectMapper().readTree(json)
+            ?.get("error")
+            ?.get("code")
+            ?.asText()
+    } catch (e: Exception) {
+        null
+    }
+
+    private fun handleOpenAiException(ex: WebClientResponseException): CoreException = when (ex) {
+        is WebClientResponseException.Unauthorized -> CoreException(ErrorType.OPENAI_API_KEY_INVALID)
+        is WebClientResponseException.Forbidden -> CoreException(ErrorType.OPENAI_API_KEY_FORBIDDEN)
+        is WebClientResponseException.TooManyRequests -> CoreException(ErrorType.OPENAI_API_TOO_MANY_REQUESTS)
+        is WebClientResponseException.InternalServerError -> CoreException(ErrorType.OPENAI_API_INTERNAL_SERVER_ERROR)
+        else -> CoreException(ErrorType.OPENAI_API_UNKNOWN_ERROR)
     }
 }
