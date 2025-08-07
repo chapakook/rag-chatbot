@@ -48,4 +48,16 @@ enum class ErrorType(val status: HttpStatus, val code: String, val message: Stri
         HttpStatus.NOT_FOUND.reasonPhrase,
         "OpenAI API 해당모델을 찾을 수 없습니다. 요청항 모델명을 확인해주세요.",
     ),
+
+    /** QDARNT 범용 에러 */
+    QDRANT_INTERNAL_SERVER_ERROR(
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        HttpStatus.INTERNAL_SERVER_ERROR.reasonPhrase,
+        "QDARNT 서버 에러가 발생했습니다. 잠시후 다시 시도해주세요.",
+    ),
+    QDRANT_BAD_REQUEST(
+        HttpStatus.BAD_REQUEST,
+        HttpStatus.BAD_REQUEST.reasonPhrase,
+        "요청 파라메터의 오류가 있습니다. 확인 후 다시 시도해주세요.",
+    ),
 }

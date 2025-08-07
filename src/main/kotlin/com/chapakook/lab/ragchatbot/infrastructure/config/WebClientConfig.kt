@@ -15,8 +15,8 @@ class WebClientConfig {
         .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
         .build()
 
-    @Bean("qdartWebClient")
-    fun qdartWebclient(
+    @Bean("qdrantWebClient")
+    fun qdrantWebclient(
         @Value("\${qdrant.base-url}") baseUrl: String,
     ): WebClient = WebClient.builder()
         .baseUrl(baseUrl)
