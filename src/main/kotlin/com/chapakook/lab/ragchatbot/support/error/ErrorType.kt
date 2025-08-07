@@ -13,7 +13,7 @@ enum class ErrorType(val status: HttpStatus, val code: String, val message: Stri
     OPENAI_API_UNKNOWN_ERROR(
         HttpStatus.INTERNAL_SERVER_ERROR,
         HttpStatus.INTERNAL_SERVER_ERROR.reasonPhrase,
-        "OpenAI API로부터 예상치 못한 응답을 받았습니다.",
+        "OpenAI API로부터 예상치 못한 응답을 받았습니다. 잠시후 다시 시도해주세요.",
     ),
     OPENAI_API_INTERNAL_SERVER_ERROR(
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -30,13 +30,13 @@ enum class ErrorType(val status: HttpStatus, val code: String, val message: Stri
     OPENAI_API_TOO_MANY_REQUESTS(
         HttpStatus.TOO_MANY_REQUESTS,
         HttpStatus.TOO_MANY_REQUESTS.reasonPhrase,
-        "OpenAI API 요청이 너무 많습니다. 잠시 후 다시 시도해주세요.",
+        "OpenAI API 요청이 너무 많습니다. 잠시후 다시 시도해주세요.",
     ),
     OPENAI_QUOTA_EXCEEDED(HttpStatus.TOO_MANY_REQUESTS, HttpStatus.TOO_MANY_REQUESTS.reasonPhrase, "OpenAI API 사용량을 초과했습니다."),
     OPENAI_API_REQUEST_TIMEOUT(
         HttpStatus.REQUEST_TIMEOUT,
         HttpStatus.REQUEST_TIMEOUT.reasonPhrase,
-        "OpenAI API 요청이 시간 초과되었습니다. 잠시 후 다시 시도해주세요.",
+        "OpenAI API 요청이 시간 초과되었습니다. 잠시후 다시 시도해주세요.",
     ),
     OPENAI_CONTEXT_LENGTH_EXCEEDED(
         HttpStatus.BAD_REQUEST,
@@ -59,5 +59,15 @@ enum class ErrorType(val status: HttpStatus, val code: String, val message: Stri
         HttpStatus.BAD_REQUEST,
         HttpStatus.BAD_REQUEST.reasonPhrase,
         "요청 파라메터의 오류가 있습니다. 확인 후 다시 시도해주세요.",
+    ),
+    QDRANT_TIMEOUT(
+        HttpStatus.GATEWAY_TIMEOUT,
+        HttpStatus.GATEWAY_TIMEOUT.reasonPhrase,
+        "Qdrant 응답이 일정 시간 초과하였습니다. 잠시후 다시 시도해주세요.",
+    ),
+    QDRANT_UNKNOWN_ERROR(
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        HttpStatus.INTERNAL_SERVER_ERROR.reasonPhrase,
+        "QDARNT 서버로부터 예상치 못한 응답을 받았습니다. 잠시후 다시 시도해주세요.",
     ),
 }
