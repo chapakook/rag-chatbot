@@ -32,10 +32,10 @@ class OpenAiEmbeddingClientTest {
          * - [x] 유효하지 않은 API 키는 `OPENAI_API_KEY_INVALID` 반환한다.
          * - [x] 권한 없는 API 키는 `OPENAI_API_KEY_FORBIDDEN` 반환한다.
          * - [x] 요청이 너무 빠르면 `OPENAI_API_TOO_MANY_REQUESTS` 반환한다.
-         * - [ ] 요청 길이가 너무 길면 `OPENAI_CONTEXT_LENGTH_EXCEEDED` 반환한다.
-         * - [ ] 요청 사용량 초과 시 `OPENAI_QUOTA_EXCEEDED` 반환한다.
+         * - [x] 요청 길이가 너무 길면 `OPENAI_CONTEXT_LENGTH_EXCEEDED` 반환한다.
+         * - [x] 요청 사용량 초과 시 `OPENAI_QUOTA_EXCEEDED` 반환한다.
          * - [x] 서버 오류는 `OPENAI_INTERNAL_SERVER_ERROR` 반환한다.
-         * - [ ] 모델 이름이 잘못되면 `OPENAI_MODEL_NOT_FOUND` 반환한다.
+         * - [x] 모델 이름이 잘못되면 `OPENAI_MODEL_NOT_FOUND` 반환한다.
          * - [x] 정상 요청시 1536 길이의 벡터를 반환한다.
          */
         @Test

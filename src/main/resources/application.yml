@@ -8,3 +8,7 @@ springdoc:
   use-fqn: true
   swagger-ui:
     path: /swagger-ui.html
+
+qdrant:
+  base-url: http://localhost:6333
+  collection-name: your_collection

@@ -5,6 +5,7 @@ import com.chapakook.lab.ragchatbot.domain.embedding.EmbeddingClient
 import com.chapakook.lab.ragchatbot.support.error.CoreException
 import com.chapakook.lab.ragchatbot.support.error.ErrorType
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
@@ -12,9 +13,10 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 @Component
 class OpenAiEmbeddingClient(
+    @Qualifier("openAiWebClient")
     private val webClient: WebClient,
 ) : EmbeddingClient {
-    override fun embed(apiKey: String, question: String): Embedding = try {
+    override fun embed(apiKey: String, question: String): Embedding.Vector = try {
         webClient.post()
             .uri("/v1/embeddings")
             .header(HttpHeaders.AUTHORIZATION, "Bearer $apiKey")
@@ -25,7 +27,7 @@ class OpenAiEmbeddingClient(
             ?.data
             ?.firstOrNull()
             ?.embedding
-            ?.let { Embedding(it) }
+            ?.let { Embedding.Vector(it) }
             ?: throw IllegalStateException("OpenAI 응답이 null입니다")
     } catch (ex: WebClientResponseException) {
         throw handleOpenAiException(ex)
