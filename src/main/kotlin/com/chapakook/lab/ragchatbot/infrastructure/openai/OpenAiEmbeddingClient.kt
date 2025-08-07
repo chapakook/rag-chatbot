@@ -22,7 +22,8 @@ class OpenAiEmbeddingClient(
             .retrieve()
             .bodyToMono(OpenAiResponse.Embedding::class.java)
             .block()
-            ?.data?.firstOrNull()
+            ?.data
+            ?.firstOrNull()
             ?.embedding
             ?.let { Embedding(it) }
             ?: throw IllegalStateException("OpenAI 응답이 null입니다")
@@ -42,7 +43,20 @@ class OpenAiEmbeddingClient(
     private fun handleOpenAiException(ex: WebClientResponseException): CoreException = when (ex) {
         is WebClientResponseException.Unauthorized -> CoreException(ErrorType.OPENAI_API_KEY_INVALID)
         is WebClientResponseException.Forbidden -> CoreException(ErrorType.OPENAI_API_KEY_FORBIDDEN)
-        is WebClientResponseException.TooManyRequests -> CoreException(ErrorType.OPENAI_API_TOO_MANY_REQUESTS)
+        is WebClientResponseException.TooManyRequests -> {
+            when (extractErrorCode(ex.responseBodyAsString)) {
+                "rate_limit_exceeded" -> CoreException(ErrorType.OPENAI_API_TOO_MANY_REQUESTS)
+                "quota_exceeded" -> CoreException(ErrorType.OPENAI_QUOTA_EXCEEDED)
+                else -> CoreException(ErrorType.OPENAI_API_UNKNOWN_ERROR)
+            }
+        }
+        is WebClientResponseException.BadRequest -> {
+            when (extractErrorCode(ex.responseBodyAsString)) {
+                "context_length_exceeded" -> CoreException(ErrorType.OPENAI_CONTEXT_LENGTH_EXCEEDED)
+                else -> CoreException(ErrorType.OPENAI_API_UNKNOWN_ERROR)
+            }
+        }
+        is WebClientResponseException.NotFound -> CoreException(ErrorType.OPENAI_MODEL_NOT_FOUND)
         is WebClientResponseException.InternalServerError -> CoreException(ErrorType.OPENAI_API_INTERNAL_SERVER_ERROR)
         else -> CoreException(ErrorType.OPENAI_API_UNKNOWN_ERROR)
     }
