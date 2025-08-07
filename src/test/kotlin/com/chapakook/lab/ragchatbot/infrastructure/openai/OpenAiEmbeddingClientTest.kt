@@ -17,6 +17,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.core.publisher.Mono
 import java.nio.charset.StandardCharsets
 
+@DisplayName("OpenAI Embedding Client Unit Tests")
 class OpenAiEmbeddingClientTest {
     private val webClient: WebClient = mockk()
     private val requestBodyUriSpec: WebClient.RequestBodyUriSpec = mockk()
@@ -25,7 +26,7 @@ class OpenAiEmbeddingClientTest {
     private val responseSpec: WebClient.ResponseSpec = mockk()
     private val openAiEmbeddingClient: OpenAiEmbeddingClient = OpenAiEmbeddingClient(webClient)
 
-    @DisplayName("OpenAI Embedding Client Tests")
+    @DisplayName("Embed Tests")
     @Nested
     inner class Embed {
         /**
