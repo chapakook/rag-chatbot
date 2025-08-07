@@ -18,6 +18,7 @@ import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import reactor.core.publisher.Mono
+import java.util.concurrent.TimeoutException
 
 @DisplayName("Qdart Vector Repository Unit Tests")
 class QdrantVectorRepositoryTest {
@@ -33,11 +34,11 @@ class QdrantVectorRepositoryTest {
     @Nested
     inner class Search {
         /**
-         * - [ ] Qdrant 응답이 비정상 JSON이면 `QDRANT_UNKNOWN_ERROR` 반환한다.
-         * - [ ] Qdrant 검색 중 타임아웃 발생 시 `QDRANT_TIMEOUT` 반환한다.
-         * - [ ] Qdrant 서버 오류로 인해 저장이 불가능 하면 `QDRANT_INTERNAL_SERVER_ERROR`을 반환한다.
+         * - [x] Qdrant 응답이 비정상 JSON이면 `QDRANT_UNKNOWN_ERROR` 반환한다.
+         * - [x] Qdrant 검색 중 타임아웃 발생 시 `QDRANT_TIMEOUT` 반환한다.
+         * - [x] Qdrant 서버 오류로 인해 저장이 불가능 하면 `QDRANT_INTERNAL_SERVER_ERROR`을 반환한다.
          * - [x] topK 값이 0이하 경우 `QDRANT_BAD_REQUEST`를 반환한다.
-         * - [ ] Qdrant 응답이 null이면 빈 리스트를 반환한다.
+         * - [x] Qdrant 응답이 null이면 빈 리스트를 반환한다.
          * - [x] 정상 요청시 관련된 `Chunk` 리스트를 반환한다.
          */
 
@@ -78,7 +79,7 @@ class QdrantVectorRepositoryTest {
             every { requestHeadersSpec.retrieve() } returns responseSpec
             every {
                 responseSpec.bodyToMono(QdrantResponse.Search::class.java)
-            } throws java.net.SocketTimeoutException("timeout")
+            } throws TimeoutException("timeout")
 
             // act
             val exception = assertThrows<CoreException> {
@@ -212,7 +213,7 @@ class QdrantVectorRepositoryTest {
     @Nested
     inner class Save {
         /**
-         * - [ ] Qdrant 서버 오류로 인해 저장이 불가능 하면 `QDRANT_INTERNAL_SERVER_ERROR`을 반환한다.
+         * - [x] Qdrant 서버 오류로 인해 저장이 불가능 하면 `QDRANT_INTERNAL_SERVER_ERROR`을 반환한다.
          * - [x] 정상적으로 `Qdrant`에 벡터 데이터를 저장한다.
          */
 

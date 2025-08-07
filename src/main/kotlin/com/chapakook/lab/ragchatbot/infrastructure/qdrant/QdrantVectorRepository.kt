@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.WebClientResponseException
+import java.util.concurrent.TimeoutException
 
 @Component
 class QdrantVectorRepository(
@@ -17,56 +19,75 @@ class QdrantVectorRepository(
 ) : VectorRepository {
     override fun search(query: Embedding.Vector, topK: Int): List<Embedding.Chunk> {
         if (topK <= 0) throw CoreException(ErrorType.QDRANT_BAD_REQUEST)
-        return webClient.post()
-            .uri("/collections/$collectionName/points/search")
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(
-                QdrantRequest.Search(
-                    vector = query.data,
-                    top = topK,
-                    withPayload = true,
-                ),
-            )
-            .retrieve()
-            .bodyToMono(QdrantResponse.Search::class.java)
-            .block()
-            ?.results
-            ?.map {
-                it.payload
-                    .let { payload ->
-                        Embedding.Chunk(
-                            id = it.id,
-                            text = payload.text,
-                            documentId = payload.documentId,
-                            url = payload.url,
-                            vector = query,
-                        )
-                    }
-            }
-            ?: emptyList()
+        return try {
+            webClient.post()
+                .uri("/collections/$collectionName/points/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(
+                    QdrantRequest.Search(
+                        vector = query.data,
+                        top = topK,
+                        withPayload = true,
+                    ),
+                )
+                .retrieve()
+                .bodyToMono(QdrantResponse.Search::class.java)
+                .block()
+                ?.results
+                ?.map {
+                    it.payload
+                        .let { payload ->
+                            Embedding.Chunk(
+                                id = it.id,
+                                text = payload.text,
+                                documentId = payload.documentId,
+                                url = payload.url,
+                                vector = query,
+                            )
+                        }
+                }
+                ?: emptyList()
+        } catch (ex: WebClientResponseException) {
+            throw handleQdrantException(ex)
+        } catch (ex: TimeoutException) {
+            throw CoreException(ErrorType.QDRANT_TIMEOUT)
+        } catch (ex: Exception) {
+            throw CoreException(ErrorType.QDRANT_UNKNOWN_ERROR)
+        }
     }
 
     override fun save(chunks: List<Embedding.Chunk>) {
-        webClient.put()
-            .uri("/collections/$collectionName/points?wait=true")
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(
-                    QdrantRequest.Save(
-                    points = chunks.map {
-                        Qdrant.Point(
-                            id = it.id,
-                            vector = it.vector.data,
-                            payload = Qdrant.Payload(
-                                text = it.text,
-                                documentId = it.documentId,
-                                url = it.url,
-                            ),
-                        )
-                    },
-                ),
-            )
-            .retrieve()
-            .toBodilessEntity()
-            .block()
+        try {
+            webClient.put()
+                .uri("/collections/$collectionName/points?wait=true")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(
+                        QdrantRequest.Save(
+                        points = chunks.map {
+                            Qdrant.Point(
+                                id = it.id,
+                                vector = it.vector.data,
+                                payload = Qdrant.Payload(
+                                    text = it.text,
+                                    documentId = it.documentId,
+                                    url = it.url,
+                                ),
+                            )
+                        },
+                    ),
+                )
+                .retrieve()
+                .toBodilessEntity()
+                .block()
+        } catch (ex: WebClientResponseException) {
+            throw handleQdrantException(ex)
+        } catch (ex: Exception) {
+            throw CoreException(ErrorType.QDRANT_UNKNOWN_ERROR)
+        }
+    }
+
+    private fun handleQdrantException(ex: WebClientResponseException): CoreException = when (ex) {
+        is WebClientResponseException.InternalServerError -> CoreException(ErrorType.QDRANT_INTERNAL_SERVER_ERROR)
+        else -> CoreException(ErrorType.QDRANT_UNKNOWN_ERROR)
     }
 }
